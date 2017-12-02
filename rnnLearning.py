@@ -7,7 +7,7 @@
 #12/1 NOTES
 #the model haven't been debugged yet
 #
-
+import hyperparameters
 import numpy as np
 import theano as th
 import theano.tensor as T
@@ -110,11 +110,11 @@ class RNN:
     
 
 def create_forest(rnn, filename):
-    learning_rates = [1e-6]
-    momentums = [1e-8]
-    batches = [200]
-    depths = [7]
-    activations = [T.nnet.softmax]
+    learning_rates = hyperparameters.learning_rates
+    momentums = hyperparameters.momentums
+    batches = hyperparameters.batches
+    depths = hyperparameters.depths
+    activations = hyperparameters.activations
 
     for n in learning_rates:
         for m in momentums:
@@ -122,7 +122,7 @@ def create_forest(rnn, filename):
               for d in depths:
                   for f in activations:
                       #output the model
-                      rnn.fit(n,m,b,f,d)
+                      #nn.fit(n,m,b,f,d)
                       rnn.save(filename)
 
 def rnn_train(filename, seed, inputsize, numneurals, outputsize):
@@ -130,4 +130,4 @@ def rnn_train(filename, seed, inputsize, numneurals, outputsize):
     np.random.rand(seed)
     create_forest(rnn, filename)
 
-rnn_train("rnn_forest.data", seed=1, inputsize=4, numneurals=16, outputsize=4)
+rnn_train(hyperparameters.rnn_db, seed=1, inputsize=4, numneurals=16, outputsize=4)
