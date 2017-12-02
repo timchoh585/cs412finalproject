@@ -8,8 +8,9 @@ block_size = 2                  #meaning 2x2 km^2
 
 
 db = "Business_Licenses.csv"    #full database
-db_fixed = "fixed_data.csv"     #fixed database
 test_db = "test_sample.csv"     #partition of database for testing
+db_fixed = "fixed_data.csv"     #fixed database
+edge_data = "edgeData.csv"      #short summary of database
 rnn_db = "rnn_forest.data"      #saved trained rnns
 logreg_db = "logreg.data"       #saved trained logreg tensor
 
