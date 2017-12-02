@@ -11,12 +11,12 @@ def distance(lat1,lat2, lon1, lon2):
     return 6373.0 * 2 * atan2(sqrt(a),sqrt(1-a))
 
 
-source = open("test_sample.csv", "rb")
-#source = open("Business_Licenses.csv", "rb")
+#source = open("test_sample.csv", "rb")
+source = open("Business_Licenses.csv", "rb")
 destination = open("edgeData.csv","w")
 fixed_data = open("fixed_data.csv","w")    
 
-data = source.read().decode("utf-16").split("\n")
+data = source.read().decode("utf-8").split("\n")
 labels = data[0].split(",")
 
 
