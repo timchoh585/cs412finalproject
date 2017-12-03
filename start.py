@@ -13,16 +13,11 @@ import rnnLearning
 import sortInfo
 import training
 import logregBlockLearning
-
-#list of all hyperparameters
-seed = 1            #seed used to create rnn rf
-depth = 7           #recurence depth
-block_size = 2      #size of block in km, squares have been used
-frame_sep = ";;;"   #token to parse different time frame of db
+import hyperparameters
 
 #source with db
 #source = open("Business_Licenses.csv","rb")
-source = open("test_sample.csv","rb")
+source = open(hyperparameters.db,"rb")
 #destination to store the data
 destination = open("model_results.data","w")
 
@@ -41,7 +36,7 @@ def train:
 
     #4, train rnn rf based on blocks with time frames and save results
 
-
+    #5, train logreg to weight each RNN properly
 
 def show_result:
     "parse bac from destination and draw heat maps using .. plt
