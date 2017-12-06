@@ -19,7 +19,8 @@ def fix_data(filename):
     # Had to change my filename to "data.csv" because
     # it is called that in repository
     #
-    # filename = "data.csv"
+    
+    filename = "data.csv"
     #
     
     source = open(filename, "rb")
@@ -46,7 +47,11 @@ def fix_data(filename):
     index_start = labels.index("LICENSE TERM START DATE")
     index_end   = labels.index("LICENSE TERM EXPIRATION DATE")
         
-    #init matrix for fixed_data
+    #init matrix for fixed_data    
+
+            
+    
+
     matrix_fixed = []
     
     #assign current max/min values for lat/lon
@@ -93,8 +98,8 @@ def fix_data(filename):
             if min_longitude > v_lon:
                 min_longitude = v_lon
                 
-            matrix_fixed.append(matrix[i][lat] + ',')
-            matrix_fixed.append(matrix[i][lon] + ',')
+            matrix_fixed.append(matrix[i][lon])
+            matrix_fixed.append(matrix[i][lat])
         except:
             "ignore that point"
             
@@ -124,41 +129,65 @@ def fix_data(filename):
 
     #now put data back with only necessary info
     
+    # printing 
     counter = 0
     for entry in matrix_fixed:
-        fixed_data.write(entry)
-        sys.stdout.write(entry)
+        if counter == 2:
+            fixed_data.write(entry)
+            sys.stdout.write(entry)
+
+        else:
+            fixed_data.write(entry + ',')
+            sys.stdout.write(entry + ',')
+
+
         counter += 1
 
         if counter == 3:
-            fixed_data.write("\n")
-            print("\n")
-            
+            fixed_data.write('\n')
+            print('\n')
             counter = 0
             
     
     #
     #TODO : sort by date and separate to chunks 
     #
-    
-    
-    #for i in range(len(matrix_fixed)):
-    #    lat = 0.0
-    #    lon = 0.0
-    #    try:
-    #        lat = float(matrix_fixed[i][index_lat])
-    #        lon = float(matrix_fixed[i][index_lon])
-    #   except:
-    #        lat = float(matrix_fixed[i][index_lat+2])
-    #        lon = float(matrix_fixed[i][index_lon+2])
 
-    #    x = distance(min_latitude,lat,min_longitude,min_longitude)
-    #    y = distance(min_latitude,min_latitude,min_longitude,lon)
-    #    matrix_fixed[i] += [str(x),str(y)]
-    #   fixed_data.write("\n" + ",".join(matrix_fixed[i]))
-
+    
+    # 
+    #0  1  2
+    #3  4  5
+    #6  7  8
+    #.  .  .
+    #.  .  .
+    #
+    
+    for i in range(len(matrix_fixed)/3):
+        lat = 0.0
+        lon = 0.0
+        index = 3 * i
+        # index is used becuase it is one dimensional array, so converting index via 'row'
+        try:
+            lat = float(matrix_fixed[index+1])
+            lon = float(matrix_fixed[index])
+            #print('lat is')
+            #print(lat)
+            #print('lon is')
+            #print(lon)
+        except:
+            lat = float(matrix_fixed[index+3]) # == 1 + 2
+            lon = float(matrix_fixed[index+2]) # == 0 + 2
+            
+        x = distance(min_latitude,lat,min_longitude,min_longitude)
+        
+        y = distance(min_latitude,min_latitude,min_longitude,lon)
+    
+        
+        
+        #matrix_fixed[i] += [str(x),str(y)]
+      #  fixed_data.write("\n" + ",".join(matrix_fixed[i]))
     #output results
-                  
+                      
     labels = ["max_latitude","min_latitude","max_longitude","min_longitude", "east_west","south_north"]
     result = [max_latitude, min_latitude, max_longitude, min_longitude, east_west, south_north]
 
