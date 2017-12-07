@@ -21,7 +21,6 @@ def predict(model, X, type="tensor"):
 
 
 def fit(X, Y, limit, n, eps, pred=predict):
-    print("Number of iterations: " + str(limit))
     sizeX = len(X[0])
     sizeY = len(Y[0])
     w = np.zeros((sizeX, sizeY))
@@ -61,7 +60,6 @@ def train_forest(forest, X, Y, last):
             row.append(y)
         data.append(row)
 
-    print(data)
     model = fit(data,Y,hp.limit, hp.learning_rates[0],1e-4)
 
     question = []

@@ -39,7 +39,7 @@ def fix_data(filename):
         #print(temp)
 
     #put only necessary labels in 
-    fixed_data.write("x_location,y_location,time_frame\n")
+    #fixed_data.write("x_location,y_location,time_frame\n")
     #erase headers in data.csv
     data = data[1:]
     #matrix of the data
@@ -181,12 +181,25 @@ def fix_data(filename):
         destination.write( ",".join( labels ) + "\n" )
         destination.write( ",".join( [ str( x ) for x in result ] ) )
 
-        fixed_data.write( ",".join( [ x for x in matrix_fixed[i] ] ) )
- 
-    print( matrix_fixed )
+        fixed_data.write( ",".join( [ x for x in matrix_fixed[i] ] )  + "\n")
 
+def read_and_convert_to_tensor(source):
+    matrix = [x.split(',') for x in open(source,"r").read().split("\n")][:-1]
 
-######
-#TEST RUN
-######
-fix_data( hyperparameters.test_db )
+   # number of blocks that we have
+    point_len = 23*22
+    data = []
+    for row in matrix:
+        x = row[0]
+        y = row[1]
+        times = row[2]
+        block = int(float(x)/2) + 3 * int(float(y))
+        for frame in times.split(';'):
+            id = int(frame)
+            # expand if requires
+            if len(data) <= id:
+                for i in range(len(data), id+1):
+                    data.append([0 for k in range(point_len)])
+            data[id][block] += 1
+
+    return data

@@ -39,11 +39,11 @@ def softmax(X):
     return exp / np.sum(exp, axis=1)[:, None]
 
 
-learning_rates = [1e-6]          #set of learing rates
-activations = [empty]             #set of activation functions for hidden layer
+learning_rates = [1e-6,1e-4]          #set of learing rates
+activations = [empty]                      #set of activation functions for hidden layer
 inv_activations = [inv_empty]
-num_neurals = [3,6]
-limit = 5000
+num_neurals = [1024,2048]
+limit = 500
 ###
 # logreg hyperparameters
 ###

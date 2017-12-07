@@ -31,8 +31,8 @@ class SNN:
                 self.Wh -= lr * np.multiply(dWh,self.Wh)
                 self.bo -= lr * np.multiply(dbo,self.bo)
                 self.Wx -= lr * np.multiply(dWx,self.Wx)
-            #if i % 50 == 0:
-               # print("At " + str(i))
+            if i % 5 == 0:
+                print("At " + str(i))
 
     def predict(self, X):
         h = self.f(np.matmul(X,self.Wx))

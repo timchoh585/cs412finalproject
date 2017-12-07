@@ -25,12 +25,9 @@ def train():
     # see sortInfo
     si.fix_data(hp.db)
     # 3, convert data to block using logReg or what ever model is defined
-    print("start")
     data = si.read_and_convert_to_tensor(hp.db_fixed)
-    print(data)
     X = data[:-1]
     Y = data[1:]
-    print(X)
     last = data[-1]
     # 4, train rnn rf based on blocks with time frames and save results
     forest = SNN.forest(X, Y, last)
