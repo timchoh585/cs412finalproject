@@ -62,6 +62,8 @@ def fix_data(filename):
     max_longitude = float( matrix[0][index_lon] )
     min_longitude = float( max_longitude )
 
+
+    min_time = "-1"
     for i in range( len( matrix ) ):
         lat = index_lat
         lon = index_lon
@@ -87,7 +89,7 @@ def fix_data(filename):
             v_lat = float(matrix[i][lat])
             v_lon = float(matrix[i][lon])
 
-            if v_lat > 43 or v_lat < 40 or v_lon > -85 or v_lon < -89:
+            if v_lat > 44 or v_lat < 40 or v_lon > -85 or v_lon < -89:
                 raise
 
             if max_latitude < v_lat:
@@ -103,16 +105,17 @@ def fix_data(filename):
                 min_longitude = v_lon
                 
                         
-                #get time frame values
-                #
-                # get start date and end date and combine them into one string
-                #
-        
             startframe = matrix[i][tempStart]
             endframe = matrix[i][tempEnd]
             timeframe = startframe + '-' + endframe
 
             tempTime = timeframe
+            matrix_fixed.append([str(v_lat), str(v_lon), tempTime])
+
+            #TODO RN
+            if min_time == "-1":
+                min_time =timeframe
+            min_time = "update"
 
         except:
             "ignore that point"
@@ -120,32 +123,28 @@ def fix_data(filename):
     east_west = distance( 0,0, max_longitude, min_longitude )
     south_north = distance( max_latitude, min_latitude, 0,0 )
 
-    for i in range( len( matrix ) ):
+    for i in range( len( matrix_fixed) ):
+        x = distance( min_latitude,matrix_fixed[i][0],min_longitude,min_longitude )
+        y = distance( min_latitude,min_latitude,min_longitude,matrix_fixed[i][1] )
 
-        # index is used becuase it is one dimensional array, so converting index via 'row'
-            
-        x = distance( min_latitude,lat,min_longitude,min_longitude )
-        y = distance( min_latitude,min_latitude,min_longitude,lon )
-    
-        temp_matrix.append( x )
-        temp_matrix.append( y )
-        temp_matrix.append( tempTime )
-            
-            
-            #matrix_fixed[i] += [str(x),str(y)]
-        #  fixed_data.write("\n" + ",".join(matrix_fixed[i]))
-        #output results
-                        
+        #TODO RN CONVERT TO SOME INT VALUE THAT INDICATES THE TIME FRAME ##
+        #IE. THE FIRST TIME FRAME HAS VALU1 1, ALL DATAPOINT AT THAT PERIOD WILL HAVE VALUE 1
+        #THEN INCREMENT
+        #THE SIZE OF THE FRAME IS 2 MONTHS
+        fixed_time = "??"
+
+
+        matrix_fixed[i][0] = str(x)
+        matrix_fixed[i][1] = str(y)
+        matrix_fixed[i][2] = str(fixedTime)
+
         labels = [ "max_latitude","min_latitude","max_longitude","min_longitude", "east_west","south_north" ]
         result = [ max_latitude, min_latitude, max_longitude, min_longitude, east_west, south_north ]
 
         destination.write( ",".join( labels ) + "\n" )
         destination.write( ",".join( [ str( x ) for x in result ] ) )
 
-        matrix_fixed.append( temp_matrix )
-        temp_matrix = []
-        tempTime = ''
-        
+        fixed_data(",".join([x for x in matrix_fixed[i]]))
 
     print( matrix_fixed )
 
