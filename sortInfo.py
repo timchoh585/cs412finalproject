@@ -1,6 +1,10 @@
 import hyperparameters
 import sys
 from math import sin, cos, sqrt, atan2, radians
+import time
+from datetime import date
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 def distance(lat1,lat2, lon1, lon2):
     lat1 = radians(lat1)
@@ -63,7 +67,7 @@ def fix_data(filename):
     min_longitude = float( max_longitude )
 
 
-    min_time = "-1"
+    min_time = "01/01/2020"
     for i in range( len( matrix ) ):
         lat = index_lat
         lon = index_lon
@@ -105,38 +109,70 @@ def fix_data(filename):
                 min_longitude = v_lon
                 
                         
-            startframe = matrix[i][tempStart]
-            endframe = matrix[i][tempEnd]
-            timeframe = startframe + '-' + endframe
+            startFrame = matrix[i][tempStart]
+            endFrame = matrix[i][tempEnd]
+            if endFrame == "":
+                endFrame = "12/7/2017"
+            timeFrame = startFrame + '-' + endFrame
 
-            tempTime = timeframe
-            matrix_fixed.append([str(v_lat), str(v_lon), tempTime])
+            tempTime = timeFrame
+            print( tempTime )
 
-            #TODO RN
-            if min_time == "-1":
-                min_time =timeframe
-            min_time = "update"
+            testMinDate = datetime.strptime( min_time, '%m/%d/%Y' ).date()
+            testFrameMin = datetime.strptime( startFrame, '%m/%d/%Y' ).date()
+            print( testMinDate, testFrameMin )
+            if testMinDate > testFrameMin:
+                min_time = ("%m/%d/%Y").format( testFrameMin )
 
+            matrix_fixed.append( [ str(v_lat), str(v_lon), str( tempTime ) ] )
+
+            
         except:
             "ignore that point"
 
     east_west = distance( 0,0, max_longitude, min_longitude )
     south_north = distance( max_latitude, min_latitude, 0,0 )
 
-    for i in range( len( matrix_fixed) ):
-        x = distance( min_latitude,matrix_fixed[i][0],min_longitude,min_longitude )
-        y = distance( min_latitude,min_latitude,min_longitude,matrix_fixed[i][1] )
+    for i in range( len( matrix_fixed ) ):
+        x = distance( min_latitude, float( matrix_fixed[i][0] ), min_longitude, min_longitude )
+        y = distance( min_latitude, min_latitude, min_longitude, float( matrix_fixed[i][1] ) )
 
-        #TODO RN CONVERT TO SOME INT VALUE THAT INDICATES THE TIME FRAME ##
-        #IE. THE FIRST TIME FRAME HAS VALU1 1, ALL DATAPOINT AT THAT PERIOD WILL HAVE VALUE 1
-        #THEN INCREMENT
-        #THE SIZE OF THE FRAME IS 2 MONTHS
-        fixed_time = "??"
+        frameCounter = 0
 
+        frame = matrix_fixed[i][2].split( "-" )
+        startDate = frame[0]
+        endDate = frame[1]
 
-        matrix_fixed[i][0] = str(x)
-        matrix_fixed[i][1] = str(y)
-        matrix_fixed[i][2] = str(fixedTime)
+        minDate = min_time
+
+        minimum = datetime.strptime( minDate, '%m/%d/%Y' ).date()
+        start = datetime.strptime( startDate, '%m/%d/%Y' ).date()
+        end = datetime.strptime( endDate, '%m/%d/%Y' ).date()
+
+        startSpread = minimum
+        endSpread = minimum
+
+        minToStart = []
+        minToEnd = []
+        startCounter = 0
+        endCounter = 0
+
+        while startSpread < start:
+            minToStart.append( str( startCounter ) )
+            startSpread += relativedelta( months=2 )
+            startCounter += 1
+
+        while endSpread < end:
+            minToEnd.append( str( endCounter ) )
+            endSpread += relativedelta( months=2 )
+            endCounter += 1
+
+        difference = list( set( minToEnd ) ^ set( minToStart ) )
+        difference.sort()
+
+        matrix_fixed[i][0] = str( x )
+        matrix_fixed[i][1] = str( y )
+        matrix_fixed[i][2] = ";".join( difference )
 
         labels = [ "max_latitude","min_latitude","max_longitude","min_longitude", "east_west","south_north" ]
         result = [ max_latitude, min_latitude, max_longitude, min_longitude, east_west, south_north ]
@@ -144,31 +180,12 @@ def fix_data(filename):
         destination.write( ",".join( labels ) + "\n" )
         destination.write( ",".join( [ str( x ) for x in result ] ) )
 
-        fixed_data(",".join([x for x in matrix_fixed[i]]))
-
+        fixed_data.write( ",".join( [ x for x in matrix_fixed[i] ] ) )
+ 
     print( matrix_fixed )
 
 
-def read_and_convert_to_tensor(source):
-    matrix = [x.split(',') for x in open(source,"r").read().split("\n")]
-
-   # number of blocks that we have
-    point_len = 9*1
-    data = []
-    for row in matrix:
-        x = row[0]
-        y = row[1]
-        times = row[2]
-        block = int(int(x)/2) + 3 * int(y)
-        for frame in times.split(';'):
-            id = int(frame)
-            # expand if requires
-            if len(data)<= id:
-                for i in range(len(data), id+1):
-                    data.append([0 for k in range(point_len)])
-            data[id][block] += 1
-
-    return data
 ######
 #TEST RUN
 ######
+fix_data( hyperparameters.test_db )
