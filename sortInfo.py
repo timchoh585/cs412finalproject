@@ -166,7 +166,6 @@ def read_and_convert_to_tensor(source):
             if len(data)<= id:
                 for i in range(len(data), id+1):
                     data.append([0 for k in range(point_len)])
-            print(id,block, data)
             data[id][block] += 1
 
     return data

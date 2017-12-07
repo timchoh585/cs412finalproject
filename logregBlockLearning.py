@@ -7,8 +7,13 @@ import hyperparameters as hp
 import numpy as np
 import SNN
 
-def predict(model, X):
-    power = np.matmul(X, model)
+def predict(model, X, type="tensor"):
+    if type == "tensor":
+        power = []
+        for x in X:
+            power.append(np.matmul(np.transpose(x),model))
+    if type == "matrix":
+        power = np.matmul(np.transpose(X),model)
     power = power - np.amax(power, axis=1)[:, None]
     exp = np.exp(power)
     prediction = exp / np.sum(exp, axis=1)[:, None]
@@ -55,6 +60,8 @@ def train_forest(forest, X, Y, last):
             y, _ = snn.predict(x)
             row.append(y)
         data.append(row)
+
+    print(data)
     model = fit(data,Y,hp.limit, hp.learning_rates[0],1e-4)
 
     question = []
@@ -62,6 +69,6 @@ def train_forest(forest, X, Y, last):
         y, _ = snn.predict(last)
         question.append(y)
 
-    y = predict(model, question)
+    y = predict(model, question, "matrix")
 
     return model, y
