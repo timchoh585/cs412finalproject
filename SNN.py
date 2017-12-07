@@ -68,10 +68,3 @@ def forest(X,Y, last):
                 # print(filename + " with mean error = " + str(rnn.mean))
                 forest.append(rnn)
     return forest
-
-
-x = [[1,1],[0,0]]
-y = [[1],[0]]
-last = [1,1]
-
-forest(x,y,last)
