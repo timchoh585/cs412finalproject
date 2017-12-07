@@ -116,17 +116,20 @@ def fix_data(filename):
             timeFrame = startFrame + '-' + endFrame
 
             tempTime = timeFrame
-            print( tempTime )
 
-            testMinDate = datetime.strptime( min_time, '%m/%d/%Y' ).date()
-            testFrameMin = datetime.strptime( startFrame, '%m/%d/%Y' ).date()
-            print( testMinDate, testFrameMin )
-            if testMinDate > testFrameMin:
-                min_time = ("%m/%d/%Y").format( testFrameMin )
+            cur_min = [int(x) for x in startFrame.split('/')]
+            old_min = [int(x) for x in min_time.split('/')]
+
+            if old_min[2] > cur_min[2]:
+                min_time = startFrame
+            elif old_min[2] == cur_min[2]:
+                if old_min[0] > cur_min[0]:
+                    min_time = startFrame
+                elif old_min[0] == cur_min[0] and old_min[1] > cur_min[1]:
+                    min_time = startFrame
 
             matrix_fixed.append( [ str(v_lat), str(v_lon), str( tempTime ) ] )
 
-            
         except:
             "ignore that point"
 
@@ -149,26 +152,24 @@ def fix_data(filename):
         start = datetime.strptime( startDate, '%m/%d/%Y' ).date()
         end = datetime.strptime( endDate, '%m/%d/%Y' ).date()
 
+
+
         startSpread = minimum
         endSpread = minimum
 
         minToStart = []
-        minToEnd = []
         startCounter = 0
-        endCounter = 0
 
         while startSpread < start:
             minToStart.append( str( startCounter ) )
             startSpread += relativedelta( months=2 )
             startCounter += 1
 
-        while endSpread < end:
-            minToEnd.append( str( endCounter ) )
-            endSpread += relativedelta( months=2 )
-            endCounter += 1
-
-        difference = list( set( minToEnd ) ^ set( minToStart ) )
-        difference.sort()
+        difference = []
+        while start < end:
+            difference.append(str(startCounter))
+            startCounter += 1
+            start += relativedelta(months= 2)
 
         matrix_fixed[i][0] = str( x )
         matrix_fixed[i][1] = str( y )
