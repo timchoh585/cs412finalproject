@@ -30,11 +30,11 @@ def train():
     Y = data[1:]
     last = data[-1]
     # 4, train rnn rf based on blocks with time frames and save results
-    forest = SNN.forest(X, Y, last)
+    #forest = SNN.forest(X, Y, last)
     # 5, train logreg to weight each RNN properly
-    model, y = lg.train_forest(forest, X, Y, last)
+    #model, y = lg.train_forest(forest, X, Y, last)
     # 6, show result
-    hm.create_heat(y)
+    hm.create_heat(X[1])
 
 # def show_result():
 # "parse bac from destination and draw heat maps using .. plt
