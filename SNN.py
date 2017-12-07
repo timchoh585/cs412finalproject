@@ -9,7 +9,7 @@ def init_weight(n, m):
 
 
 class SNN:
-    def __init__(self, size_x, size_y, size_h, activation=empty, inv_activation=empty):
+    def __init__(self, size_x, size_y, size_h, activation=hp.empty, inv_activation=hp.empty):
         self.Wx = init_weight(size_x, size_h)
         self.Wh = init_weight(size_h, size_y)
         self.bo = np.zeros(size_y)
@@ -28,23 +28,50 @@ class SNN:
 
                 dWx = np.matmul(np.array([x]).T,[np.matmul(err, self.Wh.T)])
 
-                self.Wh += lr * dWh
-                self.bo += lr * dbo
-                self.Wx += lr * dWx
-            if i % 50 == 0:
-                print("At " + str(i))
+                self.Wh -= lr * np.multiply(dWh,self.Wh)
+                self.bo -= lr * np.multiply(dbo,self.bo)
+                self.Wx -= lr * np.multiply(dWx,self.Wx)
+            #if i % 50 == 0:
+               # print("At " + str(i))
 
     def predict(self, X):
         h = self.f(np.matmul(X,self.Wx))
         return np.matmul(h, self.Wh) + self.bo, h
 
-    def save(self, file):
-        "save to file"
+    def save(self, file, i):
+        data = np.array([self.Wx, self.Wh, self.bo, [i]]).T
+        #np.savetxt(file,data, delimiter =',')
 
-def forest(X,Y):
+    def mean(self,X,Y):
+        error = 0
+        count = 0
+        for (x,y) in zip(X,Y):
+            p, _ = self.predict(x)
+            error += np.sum(y) - np.sum(p)
+            count += 1
+
+        return error/count
+
+
+def forest(X,Y, last):
+    forest = []
     for l in hp.learning_rates:
         for h in hp.num_neurals:
-            for f,f1 in zip(hp.activations, hp.inv_activations):
-                rnn = SNN(X.shape[0],Y.shape[0], h,f,f1)
+            for f,f1,i in zip(hp.activations, hp.inv_activations,range(len(hp.activations))):
+                rnn = SNN(len(X[0]),len(Y[0]), h,f,f1)
                 rnn.fit(X,Y,l,hp.limit)
-                rnn.save("filename")
+                filename = "SNN_lr=" + str(l) + "_h=" + str(h) + "_f=" + str(i) + ".data"
+                print(filename)
+                rnn.save(filename,i)
+                mean = rnn.mean(X,Y)
+                print(mean)
+                # print(filename + " with mean error = " + str(rnn.mean))
+                forest.append(rnn)
+    return forest
+
+
+x = [[1,1],[0,0]]
+y = [[1],[0]]
+last = [1,1]
+
+forest(x,y,last)

@@ -1,7 +1,6 @@
 #here is the list of all hyperparameters of the model
 
-import theano.tensor as T
-
+import numpy as np
 seed = 1                        #seed to repeat the result
 depth = 7                       #depth of rnn
 block_size = 2                  #meaning 2x2 km^2
@@ -40,10 +39,10 @@ def softmax(X):
     return exp / np.sum(exp, axis=1)[:, None]
 
 
-learning_rates = [1e-6, 1e-4,1e-2,1e0,1e2]          #set of learing rates
-activations = [empty, sigmoid, softmax]             #set of activation functions for hidden layer
-inv_activations = [inv_empty, sigmoid, softmax]
-num_neurals = [1024, 2048, 4096]
+learning_rates = [1e-6]          #set of learing rates
+activations = [empty]             #set of activation functions for hidden layer
+inv_activations = [inv_empty]
+num_neurals = [3,6]
 limit = 5000
 ###
 # logreg hyperparameters

@@ -2,40 +2,10 @@
 # (return vector of density businesses type)
 # or argmax of densities
 # up to discuss
-# @author
-# Wolf
-# project 5, machine learning
 
 import hyperparameters as hp
-import data_parser as p
 import numpy as np
-
-def fit(X, Y, limit, n, eps):
-    print("Number of iterations: " + str(limit))
-    sizeX = X.shape[1]
-    sizeY = Y.shape[1]
-    w = np.zeros((sizeX, sizeY))
-    grad = np.zeros((sizeX, sizeY))
-
-    count = 0
-    absgrad = eps + 1
-    while absgrad > eps:
-        prediction = predict(w, X)
-
-        for j in range(len(w)):
-            grad[j] = np.sum([(y * x[j] - x[j] * s) for x, y, s in zip(X, Y, prediction)], axis=0)
-        w = w + n * grad
-        count += 1
-
-        if count > limit:
-            break
-
-        # if count % 100 == 0:
-        print("At iteration: " + str(count))
-
-        absgrad = np.sum(np.square(grad))
-    return w
-
+import SNN
 
 def predict(model, X):
     power = np.matmul(X, model)
@@ -45,6 +15,53 @@ def predict(model, X):
     return prediction
 
 
+def fit(X, Y, limit, n, eps, pred=predict):
+    print("Number of iterations: " + str(limit))
+    sizeX = len(X[0])
+    sizeY = len(Y[0])
+    w = np.zeros((sizeX, sizeY))
+    grad = np.zeros((sizeX, sizeY))
+
+    count = 0
+    absgrad = eps + 1
+    while absgrad > eps:
+        prediction = pred(w, X)
+
+        for j in range(len(w)):
+            grad[j] = np.sum([(np.matmul(x[j],y) - np.matmul(x[j],s)) for x, y, s in zip(X, Y, prediction)], axis=0)
+        w = w + n * grad
+        count += 1
+
+        if count > limit:
+            break
+
+        # if count % 100 == 0:
+        #print("At iteration: " + str(count))
+
+        absgrad = np.sum(np.square(grad))
+    return w
+
+
 def run_log_reg(X):
     model = np.fromfile(hp.logreg_db, dtype=float32)
     return predict(model, X)
+
+
+def train_forest(forest, X, Y, last):
+    data = []
+    for x in X:
+        row = []
+        for snn in forest:
+            y, _ = snn.predict(x)
+            row.append(y)
+        data.append(row)
+    model = fit(data,Y,hp.limit, hp.learning_rates[0],1e-4)
+
+    question = []
+    for snn in forest:
+        y, _ = snn.predict(last)
+        question.append(y)
+
+    y = predict(model, question)
+
+    return model, y
