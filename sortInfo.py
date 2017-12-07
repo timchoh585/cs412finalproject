@@ -153,20 +153,20 @@ def read_and_convert_to_tensor(source):
     matrix = [x.split(',') for x in open(source,"r").read().split("\n")]
 
    # number of blocks that we have
-    point_len = 22*24
+    point_len = 9*1
     data = []
     for row in matrix:
         x = row[0]
         y = row[1]
         times = row[2]
-        block = int(x)/2 + 11 * int(y)
+        block = int(int(x)/2) + 3 * int(y)
         for frame in times.split(';'):
             id = int(frame)
             # expand if requires
-            if len(data)< id:
+            if len(data)<= id:
                 for i in range(len(data), id+1):
                     data.append([0 for k in range(point_len)])
-
+            print(id,block, data)
             data[id][block] += 1
 
     return data
