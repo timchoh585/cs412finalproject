@@ -149,7 +149,27 @@ def fix_data(filename):
     print( matrix_fixed )
 
 
+def read_and_convert_to_tensor(source):
+    matrix = [x.split(',') for x in open(source,"r").read().split("\n")]
+
+   # number of blocks that we have
+    point_len = 22*24
+    data = []
+    for row in matrix:
+        x = row[0]
+        y = row[1]
+        times = row[2]
+        block = int(x)/2 + 11 * int(y)
+        for frame in times.split(';'):
+            id = int(frame)
+            # expand if requires
+            if len(data)< id:
+                for i in range(len(data), id+1):
+                    data.append([0 for k in range(point_len)])
+
+            data[id][block] += 1
+
+    return data
 ######
 #TEST RUN
 ######
-fix_data(hyperparameters.test_db)
