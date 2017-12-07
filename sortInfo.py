@@ -52,25 +52,22 @@ def fix_data(filename):
         
     #init matrix for fixed_data    
 
-    matrix_fixed = [[]]
-    
-    #assign current max/min values for lat/lon
-    max_latitude = float(matrix[0][index_lat])
-    min_latitude = max_latitude
-    
-    max_longitude = float(matrix[0][index_lon])
-    min_longitude = float(max_longitude)
-    
+    matrix_fixed = []
+    temp_matrix = []
+    tempTime = ''
 
-    for i in range(len(matrix)):
+    max_latitude = float( matrix[0][index_lat] )
+    min_latitude = float( max_latitude )
+    
+    max_longitude = float( matrix[0][index_lon] )
+    min_longitude = float( max_longitude )
+
+    for i in range( len( matrix ) ):
         lat = index_lat
         lon = index_lon
         tempStart = index_start
         tempEnd = index_end
-        
-        
-        #get long/lat values
-        
+
         try:
             float(matrix[i][lat])
             
@@ -92,13 +89,16 @@ def fix_data(filename):
 
             if v_lat > 43 or v_lat < 40 or v_lon > -85 or v_lon < -89:
                 raise
+
             if max_latitude < v_lat:
                 max_latitude = v_lat
+
             if min_latitude > v_lat:
                 min_latitude = v_lat
                    
             if max_longitude < v_lon:
                 max_longitude = v_lon
+
             if min_longitude > v_lon:
                 min_longitude = v_lon
                 
@@ -111,103 +111,43 @@ def fix_data(filename):
             startframe = matrix[i][tempStart]
             endframe = matrix[i][tempEnd]
             timeframe = startframe + '-' + endframe
-            
-            print(v_lat)
-            print(v_lon)
-            print(timeframe)
 
-
-            matrix_fixed[i][0].append(v_lat)
-            matrix_fixed[i][1].append(v_lon)
-            matrix_fixed[i][2].append(timeframe)
-            
-            print(matrix_fixed[i][0])
-            print(matrix_fixed[i][1])
-            print(matrix_fixed[i][2])
-
-
+            tempTime = timeframe
 
         except:
             "ignore that point"
 
-        
-        
-        #
-        # append the final string
-        #
-        #tempMatrixList.append(timeframe)
-    
-        
+    east_west = distance( 0,0, max_longitude, min_longitude )
+    south_north = distance( max_latitude, min_latitude, 0,0 )
 
-    #print(matrix_fixed)
-        
-    #calculate range (overestimation)
-    east_west = distance(0,0, max_longitude, min_longitude)
-    south_north = distance(max_latitude, min_latitude, 0,0)
+    for i in range( len( matrix ) ):
 
-    #now put data back with only necessary info
-    
-    #print('about to print matrix_fixed')
-    #for row in matrix_fixed:
-    #    print(row)
-            
-    #for entry in matrix_fixed:
-     #      fixed_data.write(entry)
-      #      sys.stdout.write(entry)
-
-      #  else:
-      #      fixed_data.write(entry + ',')
-      #      sys.stdout.write(entry + ',')#
-
-     #   counter += 1
-
-     #   if counter == 3:
-      #      fixed_data.write('\n')
-     #       print('\n')
-     #       counter = 0
-            
-    
-    #
-    #TODO : sort by date and separate to chunks 
-    #
-
-    
-    # 
-    #0  1  2
-    #3  4  5
-    #6  7  8
-    #.  .  .
-    #.  .  .
-    #
-    
-   # for row in matrix_fixed:
         # index is used becuase it is one dimensional array, so converting index via 'row'
-    #    try:
-     #       lat = float(matrix_fixed[index])
-      #      lon = float(matrix_fixed[index])
-            #print('lat is')
-            #print(lat)
-            #print('lon is')
-            #print(lon)
-       # except:
-        #    lat = float(matrix_fixed[index+3]) # == 1 + 2
-         #   lon = float(matrix_fixed[index+2]) # == 0 + 2
             
-        #x = distance(min_latitude,lat,min_longitude,min_longitude)
-        #y = distance(min_latitude,min_latitude,min_longitude,lon)
+        x = distance( min_latitude,lat,min_longitude,min_longitude )
+        y = distance( min_latitude,min_latitude,min_longitude,lon )
     
-        
-        
-        #matrix_fixed[i] += [str(x),str(y)]
-      #  fixed_data.write("\n" + ",".join(matrix_fixed[i]))
-    #output results
-                      
-    labels = ["max_latitude","min_latitude","max_longitude","min_longitude", "east_west","south_north"]
-    result = [max_latitude, min_latitude, max_longitude, min_longitude, east_west, south_north]
+        temp_matrix.append( x )
+        temp_matrix.append( y )
+        temp_matrix.append( tempTime )
+            
+            
+            #matrix_fixed[i] += [str(x),str(y)]
+        #  fixed_data.write("\n" + ",".join(matrix_fixed[i]))
+        #output results
+                        
+        labels = [ "max_latitude","min_latitude","max_longitude","min_longitude", "east_west","south_north" ]
+        result = [ max_latitude, min_latitude, max_longitude, min_longitude, east_west, south_north ]
 
-    destination.write(",".join(labels) + "\n")
-    destination.write(",".join([str(x) for x in result]))
+        destination.write( ",".join( labels ) + "\n" )
+        destination.write( ",".join( [ str( x ) for x in result ] ) )
 
+        matrix_fixed.append( temp_matrix )
+        temp_matrix = []
+        tempTime = ''
+        
+
+    print( matrix_fixed )
 
 
 ######
